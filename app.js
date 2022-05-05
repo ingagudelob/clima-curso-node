@@ -1,4 +1,9 @@
-const { leerInput, menuInquirer, pausa } = require("./helpers/inquirer");
+const {
+  leerInput,
+  menuInquirer,
+  pausa,
+  listarLugares,
+} = require("./helpers/inquirer");
 const Busquedas = require("./models/busquedas");
 
 const main = async () => {
@@ -16,21 +21,25 @@ const main = async () => {
         console.log("=============================\n".green);
 
         // Buscar Lugares
-        const lugar = await leerInput("Ciudad:");
-        const { data } = await busqueda.ciudad(lugar);
-        console.log(data.features);
-        // Seleccional el lugar
+        const buscar = await leerInput("Ciudad:");
+        const datosDesc = await busqueda.ciudad(buscar);
 
+        // Seleccionar el lugar, se llama el id
+        const id = await listarLugares(datosDesc);
+        const { nombre, lat, long } = datosDesc.find((l) => l.id === id);
         // Clima
 
         // Mostar Resultados
-        console.log("\nInformación de la ciudad\n".green);
-        console.log("Ciudad: ", `${lugar}`.red);
-        console.log("Lat: ");
-        console.log("Long; ");
-        console.log("Temp: ");
-        console.log("Min: ");
-        console.log("Max: ");
+        if (id) {
+          console.log("\nInformación de la ciudad\n".green);
+          console.log("Ciudad: ", `${nombre}`.green);
+          console.log("Lat: ", `${lat}`.green);
+          console.log("Long; ", `${long}`.green);
+        }
+
+        //console.log("Temp: ", `${datosDesc.name}`.green);
+        //console.log("Min: ", `${datosDesc.name}`.green);
+        //console.log("Max: ", `${datosDesc.name}`.green);
 
         break;
 

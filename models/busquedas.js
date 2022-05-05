@@ -26,9 +26,15 @@ class Busquedas {
       });
 
       // LLamar la instancia
-      const dataCiudad = instance.get();
+      const dataCiudad = await instance.get();
+      const datosDesc = dataCiudad.data.features.map((lugar) => ({
+        id: lugar.id,
+        nombre: lugar.place_name,
+        lat: lugar.center[1],
+        long: lugar.center[0],
+      }));
 
-      return dataCiudad; //Retornar un array de los lugares que coincidan con el lugar solicitado
+      return datosDesc; //Retornar un array de los lugares que coincidan con el lugar solicitado
     } catch (error) {
       console.log(error);
     }
