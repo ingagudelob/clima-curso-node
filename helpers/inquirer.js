@@ -43,7 +43,7 @@ const leerInput = async (mensaje) => {
       message: mensaje,
       validate(value) {
         if (value.length === 0) {
-          return "Por favor ingrese una descripción";
+          return "¡ERROR! Debes ingresar un lugar";
         }
         return true;
       },

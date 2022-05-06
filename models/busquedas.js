@@ -1,6 +1,8 @@
 const axios = require("axios");
 require("dotenv").config();
 
+const urlOpenWeather =
+  "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}";
 class Busquedas {
   historial = ["Bogotá", "Madrid", "Miami"];
 
