@@ -1,13 +1,24 @@
 const axios = require("axios");
+const fs = require("fs");
+
 require("dotenv").config();
 
-const urlOpenWeather =
-  "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}";
+// const urlOpenWeather = `https://api.openweathermap.org/data/2.5/weather?lat={${lat}}&lon={${long}}&appid={${process.env.OPENWEATHER_KEY}}`;
 class Busquedas {
-  historial = ["Bogotá", "Madrid", "Miami"];
+  historial = [];
+  dbPath = "./db/database.json";
 
   constructor() {
     //TODO: leer DB si existe
+    this.leerBd();
+  }
+
+  get CapitalizarHistorial() {
+    return this.historial.map((lugar) => {
+      let palabras = lugar.split(" "); // split corta
+      palabras = palabras.map((p) => p[0].toUpperCase() + p.substring(1));
+      return palabras.join(" "); // join une
+    });
   }
 
   get getParams() {
@@ -15,6 +26,14 @@ class Busquedas {
       access_token: process.env.MAPBOX_KEY,
       limit: 5,
       language: "es",
+    };
+  }
+
+  get getParamsTemp() {
+    return {
+      appid: process.env.OPENWEATHER_KEY,
+      lang: "es",
+      units: "metric",
     };
   }
 
@@ -40,6 +59,56 @@ class Busquedas {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async tempCiudad(lat = "", long = "") {
+    try {
+      const dataTemp = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${process.env.OPENWEATHER_KEY}&units=metric&lang=es`
+      );
+      return dataTemp;
+    } catch (error) {
+      console.log(error.code);
+    }
+  }
+
+  addHistory(lugar = "") {
+    // TODO: Prevenir duplicados
+
+    if (this.historial.includes(lugar.toLowerCase())) {
+      return;
+    }
+
+    this.historial = this.historial.splice(0, 4);
+    // El metodo splice(muestra el array desde la posicion 0 hasta la 4)
+
+    this.historial.unshift(lugar.toLocaleLowerCase());
+    this.guardarDb(); //unshift añade al inicio del array
+
+    // Grabar en archivo de txt
+  }
+
+  guardarDb() {
+    // Por su hya mas propiedades por grabar
+    const pathHist = {
+      historial: this.historial,
+    };
+
+    fs.writeFileSync(this.dbPath, JSON.stringify(pathHist));
+  }
+
+  leerBd() {
+    if (!fs.existsSync(this.dbPath)) {
+      return;
+    }
+
+    const info = fs.readFileSync(this.dbPath, {
+      encoding: "utf-8",
+    });
+
+    const data = JSON.parse(info);
+
+    this.historial = data.historial;
   }
 }
 

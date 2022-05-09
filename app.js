@@ -26,20 +26,33 @@ const main = async () => {
 
         // Seleccionar el lugar, se llama el id
         const id = await listarLugares(datosDesc);
+        if (id === "0") continue;
+
         const { nombre, lat, long } = datosDesc.find((l) => l.id === id);
+
+        // Guardar historial
+        busqueda.addHistory(nombre);
+
+        const temps = await busqueda.tempCiudad(lat, long);
+
+        const { temp, temp_min, temp_max } = temps.data.main;
+        const { description } = temps.data.weather[0];
         // Clima
 
         // Mostar Resultados
         if (id) {
-          console.log("\nInformación de la ciudad\n".green);
+          console.clear();
+          console.log("=============================".green);
+          console.log("  Información de la ciudad   ".green);
+          console.log("=============================\n".green);
           console.log("Ciudad: ", `${nombre}`.green);
           console.log("Lat: ", `${lat}`.green);
           console.log("Long; ", `${long}`.green);
+          console.log("Temp: ", `${temp} °C`.green);
+          console.log("Temp Minima: ", `${temp_min} °C`.green);
+          console.log("Temp Maxima: ", `${temp_max} °C`.green);
+          console.log("Comentario: ", `${description}`.green);
         }
-
-        //console.log("Temp: ", `${datosDesc.name}`.green);
-        //console.log("Min: ", `${datosDesc.name}`.green);
-        //console.log("Max: ", `${datosDesc.name}`.green);
 
         break;
 
@@ -47,6 +60,10 @@ const main = async () => {
         console.log("=============================".green);
         console.log("   Historial de busquedas");
         console.log("=============================\n".green);
+
+        busqueda.CapitalizarHistorial.map((i, ix) => {
+          console.log(`${ix + 1}. ${i}`);
+        });
 
         break;
     }
